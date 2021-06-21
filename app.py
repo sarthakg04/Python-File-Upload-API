@@ -1,8 +1,11 @@
 #app.py
-from flask import Flask, json, request, jsonify
 import os
-import urllib.request
- 
+#mport urllib.request
+
+import boto3
+from flask import Flask, json, jsonify, request
+
+s3_client=boto3.client('s3',aws_access_key_id="#fill the bucket id",aws_secret_access_key="# fill the bucket access key")
 app = Flask(__name__)
  
 UPLOAD_FOLDER = 'static/uploads'
@@ -22,7 +25,7 @@ def upload_file():
         return resp
  
     files = request.files.getlist('files[]')
-     
+    path = request.files.getlist('files[]') 
     errors = {}
     success = False
      
@@ -30,6 +33,7 @@ def upload_file():
         if file:
             filename = file.filename
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            response= s3_client.upload_file(os.path.join(app.config['UPLOAD_FOLDER'], filename),'sample-php-abhi','dummmysarthak.jpg')
             success = True
         else:
             errors[file.filename] = 'File type is not allowed'
